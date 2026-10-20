@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>Meu Assistente IA</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1120;--panel:#131d30;--line:#29364c;--text:#edf3ff;--muted:#9cabc2;--accent:#7c9cff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#111b31,#080d17 60%);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+header{padding:22px 18px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#0b1120ed;backdrop-filter:blur(12px);z-index:2}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#7197ff,#a18bff);display:grid;place-items:center;font-size:23px;color:#091225}
+h1{font-size:20px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:13px}
+main{max-width:760px;margin:auto;padding:18px 14px 140px}.intro{padding:18px;border:1px solid var(--line);border-radius:20px;background:#131d30;margin-bottom:16px}.intro h2{font-size:22px;margin:0 0 8px}.intro p{color:var(--muted);margin:0;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tool{border:1px solid var(--line);background:#111a2b;color:var(--text);border-radius:17px;padding:15px;text-align:left;min-height:108px;cursor:pointer}.tool:active{transform:scale(.985)}.tool .emoji{font-size:25px}.tool strong{display:block;margin:8px 0 4px}.tool small{color:var(--muted);line-height:1.35;display:block}
+.chat{margin-top:18px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#0f1828}.chathead{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:650}.messages{padding:14px;min-height:170px;max-height:42vh;overflow:auto;display:flex;flex-direction:column;gap:10px}.bubble{padding:11px 13px;border-radius:14px;max-width:94%;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}.bot{background:#1a2740;align-self:flex-start}.user{background:#354a7b;align-self:flex-end}.empty{color:var(--muted);font-size:14px;text-align:center;padding:25px 8px}
+.composer{position:fixed;bottom:0;left:0;right:0;padding:12px max(14px,calc((100vw - 732px)/2)) calc(12px + env(safe-area-inset-bottom));background:#0b1120f2;border-top:1px solid var(--line);backdrop-filter:blur(12px);z-index:3}.compose-row{display:flex;gap:8px}.compose-row textarea{resize:none;min-height:48px;max-height:120px;flex:1;background:#131d30;border:1px solid var(--line);border-radius:14px;color:var(--text);padding:13px;font:inherit;outline:none}.send{border:0;border-radius:14px;padding:0 17px;background:var(--accent);color:#071021;font-weight:750;font-size:15px}.hint{text-align:center;color:var(--muted);font-size:11px;margin-top:7px}
+.status{font-size:12px;color:var(--muted);margin-top:10px}.status span{color:#9fe3bd}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.tool{min-height:120px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">✦</div><div><h1>Meu Assistente IA</h1><p>Seu espaço pessoal de inteligência artificial</p></div></div></header>
+<main>
+<section class="intro"><h2>O que vamos criar hoje?</h2><p>Escolha uma ferramenta para preparar seu pedido ou converse com o assistente. Para respostas reais de IA, configure a conexão segura com uma API seguindo o README.</p><div class="status" id="status">Conexão: <span>interface pronta</span></div></section>
+<section class="grid" aria-label="Ferramentas">
+<button class="tool" data-mode="chat"><span class="emoji">💬</span><strong>Conversar com IA</strong><small>Perguntas, ideias e explicações</small></button>
+<button class="tool" data-mode="image"><span class="emoji">🎨</span><strong>Ideias para imagens</strong><small>Crie prompts para geradores de imagem</small></button>
+<button class="tool" data-mode="video"><span class="emoji">🎬</span><strong>Ideias para vídeos</strong><small>Roteiros e prompts de vídeo</small></button>
+<button class="tool" data-mode="code"><span class="emoji">💻</span><strong>Código e sites</strong><small>HTML, CSS, JavaScript e depuração</small></button>
+<button class="tool" data-mode="writing"><span class="emoji">📝</span><strong>Textos e documentos</strong><small>Resumos, anúncios e escrita</small></button>
+<button class="tool" data-mode="ideas"><span class="emoji">🧠</span><strong>Ideias e planejamento</strong><small>Organize projetos e tarefas</small></button>
+</section>
+<section class="chat"><div class="chathead" id="chatTitle">💬 Conversar com IA</div><div class="messages" id="messages"><div class="empty">Digite uma mensagem abaixo para começar.<br>As ferramentas de imagem e vídeo geram instruções; a geração de mídia precisa de uma API compatível.</div></div></section>
+</main>
+<div class="composer"><div class="compose-row"><textarea id="prompt" rows="1" placeholder="Escreva sua mensagem..."></textarea><button class="send" id="send">Enviar</button></div><div class="hint">Uso pessoal • Requer internet • O uso de APIs pode ter custos</div></div>
+<script>
+const messages=document.getElementById('messages'), input=document.getElementById('prompt'), title=document.getElementById('chatTitle'), statusEl=document.getElementById('status');
+let mode='chat';
+const modes={
+ chat:{title:'💬 Conversar com IA',prefix:'Responda como um assistente útil, claro e direto. '},
+ image:{title:'🎨 Ideias para imagens',prefix:'Ajude a escrever um prompt detalhado para um gerador de imagens. Descreva sujeito, estilo, composição, iluminação e formato. Não afirme que gerou a imagem. Pedido: '},
+ video:{title:'🎬 Ideias para vídeos',prefix:'Crie um prompt para um gerador de vídeo, com cena, movimento de câmera, duração sugerida, estilo e iluminação. Não afirme que gerou o vídeo. Pedido: '},
+ code:{title:'💻 Código e sites',prefix:'Ajude com programação. Forneça código executável quando possível, explique onde usar e priorize segurança. Pedido: '},
+ writing:{title:'📝 Textos e documentos',prefix:'Ajude a escrever um texto claro e bem estruturado. Pedido: '},
+ ideas:{title:'🧠 Ideias e planejamento',prefix:'Ajude a organizar ideias em etapas práticas, apontando riscos e próximos passos. Pedido: '}
+};
+function add(text,who){const d=document.createElement('div');d.className='bubble '+who;d.textContent=text;messages.appendChild(d);messages.scrollTop=messages.scrollHeight;return d}
+function selectMode(m){mode=m;title.textContent=modes[m].title;input.placeholder=m==='image'?'Descreva a imagem que você quer...':m==='video'?'Descreva o vídeo que você quer...':m==='code'?'O que você quer programar?':'Escreva sua mensagem...';input.focus()}
+document.querySelectorAll('.tool').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));
+async function send(){const raw=input.value.trim();if(!raw)return;input.value='';add(raw,'user');const waiting=add('Pensando…','bot');
+try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:modes[mode].prefix+raw,mode})});
+const data=await res.json();waiting.remove();if(!res.ok)throw new Error(data.error||'Não foi possível conectar à IA.');add(data.reply||'A IA não retornou texto.','bot');}
+catch(e){waiting.remove();add('A conexão real com a IA ainda não está configurada ou o servidor não está ativo. '+e.message+'\\n\\nVocê pode preparar o pedido e conectar uma API seguindo o README do projeto.','bot');}
+}
+document.getElementById('send').addEventListener('click',send);input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+</script>
+</body></html>
