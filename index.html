@@ -49,7 +49,7 @@ function add(text,who){const d=document.createElement('div');d.className='bubble
 function selectMode(m){mode=m;title.textContent=modes[m].title;input.placeholder=m==='image'?'Descreva a imagem que você quer...':m==='video'?'Descreva o vídeo que você quer...':m==='code'?'O que você quer programar?':'Escreva sua mensagem...';input.focus()}
 document.querySelectorAll('.tool').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));
 async function send(){const raw=input.value.trim();if(!raw)return;input.value='';add(raw,'user');const waiting=add('Pensando…','bot');
-try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:modes[mode].prefix+raw,mode})});
+try{const res=await fetch('https://meu-assistente-ia-4sun.onrender.com/api/chat',',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:modes[mode].prefix+raw,mode})});
 const data=await res.json();waiting.remove();if(!res.ok)throw new Error(data.error||'Não foi possível conectar à IA.');add(data.reply||'A IA não retornou texto.','bot');}
 catch(e){waiting.remove();add('A conexão real com a IA ainda não está configurada ou o servidor não está ativo. '+e.message+'\\n\\nVocê pode preparar o pedido e conectar uma API seguindo o README do projeto.','bot');}
 }
